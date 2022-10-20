@@ -1,0 +1,40 @@
+class Solution {
+private:
+    vector<pair<int,int>> movements {{0,1},{0,-1},{1,0},{-1,0}};
+    vector<vector<bool>> vis;
+    int n,m;
+    bool isValid(int x,int y){
+        return x>=0 && y>=0 && x<n && y<m;
+    }
+    int bfs(vector<vector<int>>& grid){
+        int time = 0,fresh = 0;
+        n = grid.size(), m = grid[0].size();
+        vis.resize(n,vector<bool>(m,false));
+        queue<tuple<int,int,int>> q;
+        for(int i=0; i<n; ++i){
+            for(int j=0; j<m; ++j){
+                if(grid[i][j]==2)
+                    vis[i][j]=true,q.push(make_tuple(i,j,time));
+                if(grid[i][j]==1) fresh++;
+            }
+        }
+        while(!q.empty()){
+            auto node = q.front();
+            q.pop();
+            for(auto&movement: movements){
+                int x = get<0>(node) + movement.first, 
+                y = get<1>(node) + movement.second,  currTime = get<2>(node);
+                if(!isValid(x,y) || vis[x][y] || grid[x][y]==0) continue;
+                fresh--;
+                q.push(make_tuple(x,y,currTime+1));
+                vis[x][y] = true;
+                time = max(time,currTime+1);
+            }
+        }
+        return fresh?-1:time;
+    }
+public:
+    int orangesRotting(vector<vector<int>>& grid) {
+        return bfs(grid);
+    }
+};
